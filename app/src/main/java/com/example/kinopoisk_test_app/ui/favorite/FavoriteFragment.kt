@@ -76,8 +76,7 @@ class FavoriteFragment : Fragment() {
             rvFilms.isVisible = true
             pbLoading.isVisible = false
             tvEmptyPlaceholder.isVisible = false
-            moviesAdapter.clearData()
-            moviesAdapter.addMovies(movies)
+            moviesAdapter.submitList(movies)
         }
     }
 

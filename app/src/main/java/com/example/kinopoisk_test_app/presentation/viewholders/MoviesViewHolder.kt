@@ -26,6 +26,10 @@ class MoviesViewHolder(private val binding: MovieListItemBinding) :
         }
     }
 
+    fun updateFavoriteState(isFavorite: Boolean) {
+        binding.ivFavoriteStar.isVisible = isFavorite
+    }
+
     companion object {
         private const val CORNER_RADIUS = 5
     }

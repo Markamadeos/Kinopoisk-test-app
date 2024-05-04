@@ -71,7 +71,6 @@ class PopularFragment : Fragment() {
 
     private fun onMovieLongClick(movie: Movie): Boolean {
         viewModel.saveMovieToDb(movie)
-        moviesAdapter.updateItem(movie)
         return true
     }
 
@@ -182,8 +181,7 @@ class PopularFragment : Fragment() {
             rvFilms.isVisible = true
             ivInternetError.isVisible = false
             btnInternetError.isVisible = false
-            moviesAdapter.clearData()
-            moviesAdapter.addMovies(movies)
+            moviesAdapter.submitList(movies)
         }
     }
 
