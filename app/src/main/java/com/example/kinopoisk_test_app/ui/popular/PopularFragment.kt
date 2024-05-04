@@ -1,5 +1,6 @@
 package com.example.kinopoisk_test_app.ui.popular
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.kinopoisk_test_app.R
@@ -16,6 +18,7 @@ import com.example.kinopoisk_test_app.domian.models.Movie
 import com.example.kinopoisk_test_app.presentation.adapters.MoviesAdapter
 import com.example.kinopoisk_test_app.presentation.models.PopularScreenState
 import com.example.kinopoisk_test_app.presentation.viewModels.PopularViewModel
+import com.example.kinopoisk_test_app.ui.detail.DetailFragment
 import com.example.kinopoisk_test_app.util.MOVIE_ID
 import com.example.kinopoisk_test_app.util.debounce
 import com.example.kinopoisk_test_app.util.hideKeyboard
@@ -106,10 +109,21 @@ class PopularFragment : Fragment() {
             viewLifecycleOwner.lifecycleScope,
             false
         ) { movieItem ->
-            val movieBundle = bundleOf(MOVIE_ID to movieItem.id)
+            setOnClickListener(movieItem)
+        }
+    }
+
+    private fun setOnClickListener(movieItem: Movie) {
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            activity?.supportFragmentManager?.commit {
+                activity?.findViewById<View>(R.id.fc_detail_container)?.let {
+                    replace(it.id, DetailFragment.newInstance(movieItem.id))
+                }
+            }
+        } else {
             findNavController().navigate(
                 R.id.action_popularFragment_to_detailFragment,
-                movieBundle
+                bundleOf(MOVIE_ID to movieItem.id)
             )
         }
     }

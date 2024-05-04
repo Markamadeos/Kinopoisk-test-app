@@ -1,5 +1,6 @@
 package com.example.kinopoisk_test_app.ui.detail
 
+import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -20,6 +21,7 @@ import com.example.kinopoisk_test_app.presentation.models.DetailScreenState
 import com.example.kinopoisk_test_app.presentation.viewModels.DetailsViewModel
 import com.example.kinopoisk_test_app.util.MOVIE_ID
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.coroutines.Continuation
 
 class DetailFragment : Fragment() {
     private val viewModel by viewModel<DetailsViewModel>()
@@ -41,16 +43,21 @@ class DetailFragment : Fragment() {
         }
         bind()
         if (findNavController().previousBackStackEntry?.destination?.id == R.id.favoriteFragment) {
-            viewModel.getDataFromDb(requireArguments().getString(MOVIE_ID) ?: EMPTY_ID)
+            viewModel.getDataFromDb(requireArguments().getString(MOVIE_ID) ?: UNDEFINED_ID)
         } else {
-            viewModel.getDataFromNetwork(requireArguments().getString(MOVIE_ID) ?: EMPTY_ID)
+            viewModel.getDataFromNetwork(requireArguments().getString(MOVIE_ID) ?: UNDEFINED_ID)
         }
     }
 
     private fun bind() {
         with(binding) {
-            btnBack.setOnClickListener {
-                findNavController().popBackStack()
+            if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                btnBack.isVisible = false
+            } else {
+                btnBack.isVisible = true
+                btnBack.setOnClickListener {
+                    findNavController().popBackStack()
+                }
             }
         }
     }
@@ -97,7 +104,7 @@ class DetailFragment : Fragment() {
                 override fun onLoadFailed(
                     e: GlideException?,
                     model: Any?,
-                    target:Target<Drawable>?,
+                    target: Target<Drawable>?,
                     isFirstResource: Boolean
                 ): Boolean {
                     // nothing to do
@@ -130,6 +137,12 @@ class DetailFragment : Fragment() {
     }
 
     companion object {
-        private const val EMPTY_ID = ""
+        fun newInstance(id: String) = DetailFragment().apply {
+            arguments = Bundle().apply {
+                putString(MOVIE_ID, id)
+            }
+        }
+
+        private const val UNDEFINED_ID = ""
     }
 }
