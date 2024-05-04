@@ -31,6 +31,7 @@ class SearchRepositoryImpl(
                 if (data.items.isEmpty()) {
                     emit(SearchResultData.Empty(R.string.server_error))
                 } else {
+
                     emit(SearchResultData.Data(convertFromMovieDto(data.items)))
                 }
             }

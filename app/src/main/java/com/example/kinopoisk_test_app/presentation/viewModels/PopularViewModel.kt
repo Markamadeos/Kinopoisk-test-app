@@ -27,6 +27,7 @@ class PopularViewModel(
     val favoriteNotificationState: LiveData<Int> = _favoriteNotificationSate
     private var searchJob: Job? = null
     private var currentQuery = EMPTY_QUERY
+    private var popularMovies: List<Movie>? = null
 
     private fun getPopularMovies() {
         _screenState.postValue(PopularScreenState.Loading)
@@ -45,7 +46,7 @@ class PopularViewModel(
         }
     }
 
-    fun searchMovies(query: String) {
+    private fun searchMovies(query: String) {
         _screenState.postValue(PopularScreenState.Loading)
         viewModelScope.launch(Dispatchers.IO) {
             searchInteractor.searchMovies(query).collect { result ->
@@ -83,7 +84,8 @@ class PopularViewModel(
 
             is SearchResultData.Data -> {
                 if (result.value != null) {
-                    _screenState.postValue(PopularScreenState.Content(result.value))
+                    popularMovies = result.value
+                    _screenState.postValue(PopularScreenState.Content(popularMovies!!))
                 }
             }
         }
@@ -106,6 +108,11 @@ class PopularViewModel(
                 } else {
                     favoriteInteractor.saveMovieToDb(fullMovieInfo)
                     _favoriteNotificationSate.postValue(R.string.added_to_favorites)
+                    popularMovies = popularMovies?.let { ArrayList(it) }
+                    val indexForUpdate = popularMovies!!.indexOfFirst { it.id == movie.id }
+                    (popularMovies as ArrayList<Movie>)[indexForUpdate] =
+                        popularMovies!![indexForUpdate].copy(isFavorite = true)
+                    processingResult(SearchResultData.Data(popularMovies))
                 }
             }
         }
